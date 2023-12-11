@@ -1,6 +1,7 @@
 package ru.netology.controller;
 
 import com.google.gson.Gson;
+import ru.netology.exception.IsExistException;
 import ru.netology.model.Post;
 import ru.netology.service.PostService;
 
@@ -9,33 +10,43 @@ import java.io.IOException;
 import java.io.Reader;
 
 public class PostController {
-  public static final String APPLICATION_JSON = "application/json";
-  private final PostService service;
+    public static final String APPLICATION_JSON = "application/json";
+    private final PostService service;
 
-  public PostController(PostService service) {
-    this.service = service;
-  }
+    public PostController(PostService service) {
+        this.service = service;
+    }
 
-  public void all(HttpServletResponse response) throws IOException {
-    response.setContentType(APPLICATION_JSON);
-    final var data = service.all();
-    final var gson = new Gson();
-    response.getWriter().print(gson.toJson(data));
-  }
+    public void all(HttpServletResponse response) throws IOException {
+        response.setContentType(APPLICATION_JSON);
+        final var data = service.all();
+        final var gson = new Gson();
+        response.getWriter().print(gson.toJson(data));
+    }
 
-  public void getById(long id, HttpServletResponse response) {
-    // TODO: deserialize request & serialize response
-  }
+    public void getById(long id, HttpServletResponse response) throws IOException {
+        response.setContentType(APPLICATION_JSON);
+        final var gson = new Gson();
+        final var data = service.getById(id);
+        response.getWriter().print(gson.toJson(data));
+    }
 
-  public void save(Reader body, HttpServletResponse response) throws IOException {
-    response.setContentType(APPLICATION_JSON);
-    final var gson = new Gson();
-    final var post = gson.fromJson(body, Post.class);
-    final var data = service.save(post);
-    response.getWriter().print(gson.toJson(data));
-  }
+    public void save(Reader body, HttpServletResponse response) throws IOException {
+        response.setContentType(APPLICATION_JSON);
+        final var gson = new Gson();
+        final var post = gson.fromJson(body, Post.class);
 
-  public void removeById(long id, HttpServletResponse response) {
-    // TODO: deserialize request & serialize response
-  }
+        try {
+            final var data = service.save(post);
+            response.getWriter().print(gson.toJson(data));
+        } catch (IsExistException e) {
+            response.getWriter().print(gson.toJson(e.getMessage()));
+        }
+    }
+
+    public void removeById(long id, HttpServletResponse response) throws IOException {
+        response.setContentType(APPLICATION_JSON);
+        service.removeById(id);
+        response.getWriter().print("Post with id = " + id + " was removed");
+    }
 }
