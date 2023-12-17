@@ -1,6 +1,5 @@
 package ru.netology.repository;
 
-import org.springframework.stereotype.Repository;
 import ru.netology.exception.IsExistException;
 import ru.netology.model.Post;
 
@@ -10,7 +9,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-@Repository
 public class PostRepository {
     private static final Long ID_0 = 0L;
     private Long postId = 0L;
